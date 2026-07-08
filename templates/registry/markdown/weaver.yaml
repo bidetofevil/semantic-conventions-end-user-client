@@ -1,0 +1,17 @@
+templates:
+  - pattern: attributes.md.j2
+    filter: >
+      semconv_grouped_attributes({
+        "exclude_stability": []
+      })
+      | map({ root_namespace: .root_namespace,
+              attributes: (.attributes | unique_by(.name)) })
+    application_mode: each
+    file_name: "attributes/{{ctx.root_namespace}}.md"
+  - pattern: events.md.j2
+    filter: >
+      semconv_grouped_events({
+        "exclude_stability": []
+      })
+    application_mode: each
+    file_name: "events/{{ctx.root_namespace}}.md"

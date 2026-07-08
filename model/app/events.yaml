@@ -1,0 +1,12 @@
+groups:
+  - id: event.app.nav_complete
+    type: event
+    name: app.nav_complete
+    stability: development
+    brief: >
+      Fired when an app navigation event has completed.
+    attributes:
+      - ref: app.nav.destination
+        requirement_level: recommended
+      - ref: session.id
+        requirement_level: recommended
