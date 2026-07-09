@@ -34,17 +34,41 @@ scripts/                  validation / resolution / docs generation
 
 ## Getting started
 
-Install [weaver](https://github.com/open-telemetry/weaver) — download a release
-binary matching [`.weaver-version`](.weaver-version) from the
-[releases page](https://github.com/open-telemetry/weaver/releases), or
-`cargo install weaver` and make sure it is on `PATH`. All scripts need network
-access to fetch the pinned upstream registry.
+[Weaver](https://github.com/open-telemetry/weaver) is not available via package managers like Homebrew, but you can install by running
+`scripts/install-weaver.sh`, which downloads the release binary pinned in
+[`.weaver-version`](.weaver-version) and installs it to `~/.local/bin` (pass a
+different directory as the first argument if preferred).  To update it, change the version defined in
+`.weaver-version` and rerun the script.
 
 ```bash
 scripts/check.sh          # validate the model (including dependency resolution)
 scripts/resolve.sh        # produce build/resolved-registry.yaml
 scripts/generate-docs.sh  # regenerate docs/ from the model
 ```
+
+## Consuming this registry
+
+There are two ways to consume this registry:
+
+1. Generate language-specific artifacts directly. 
+   - Run `weaver registry generate` and point it at this registry with your own local templates.
+      See [PR #1828](https://github.com/open-telemetry/opentelemetry-android/pull/1828) in `opentelmetry-android` for an example:
+
+      ```bash
+      weaver registry generate \
+        -r 'https://github.com/bidetofevil/end-user-client-semantic-conventions@<tag>[model]' \
+        --templates <templates-dir> <target> <output-dir>
+      ```
+
+2. Create a new registry by extending it. 
+   - Declare it as a dependency in your own registry's `manifest.yaml`. You can then reference all the attributes,
+     events, etc. that are defined in the dependent's registry and transitively all of what's defined by its ancestors.
+
+      ```yaml
+      dependencies:
+        - name: end-user-client
+          registry_path: https://github.com/bidetofevil/end-user-client-semantic-conventions@<tag>[model]
+      ```
 
 ## Roadmap
 

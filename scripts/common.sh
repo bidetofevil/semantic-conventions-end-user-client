@@ -6,8 +6,9 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 if ! command -v weaver >/dev/null 2>&1; then
   echo "error: weaver not found on PATH." >&2
-  echo "Install a release binary from https://github.com/open-telemetry/weaver/releases" >&2
-  echo "or run 'cargo install weaver', and make sure it is on PATH." >&2
+  echo "Run scripts/install-weaver.sh to install the pinned version, or download a" >&2
+  echo "release binary from https://github.com/open-telemetry/weaver/releases and" >&2
+  echo "make sure it is on PATH." >&2
   exit 1
 fi
 
