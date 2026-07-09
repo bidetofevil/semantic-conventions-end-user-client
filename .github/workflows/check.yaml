@@ -8,28 +8,70 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - name: Install weaver
-        run: |
-          WEAVER_VERSION="$(<.weaver-version)"
-          curl -sSfL -o weaver.tar.xz \
-            "https://github.com/open-telemetry/weaver/releases/download/v${WEAVER_VERSION}/weaver-x86_64-unknown-linux-gnu.tar.xz"
-          curl -sSfL -o weaver.tar.xz.sha256 \
-            "https://github.com/open-telemetry/weaver/releases/download/v${WEAVER_VERSION}/weaver-x86_64-unknown-linux-gnu.tar.xz.sha256"
-          echo "$(awk '{print $1}' weaver.tar.xz.sha256)  weaver.tar.xz" | sha256sum -c -
-          tar -xJf weaver.tar.xz
-          echo "${PWD}/weaver-x86_64-unknown-linux-gnu" >> "${GITHUB_PATH}"
+      - name: Read pinned weaver version
+        id: weaver-version
+        run: echo "version=$(<.weaver-version)" >> "$GITHUB_OUTPUT"
 
-      - name: Validate registry
+      - name: Install Weaver
+        uses: open-telemetry/weaver/.github/actions/setup-weaver@f8e1b42fbd1e09df5263c26b7df6011eaafd454d
+        with:
+          version: '${{ steps.weaver-version.outputs.version }}'
+
+      - name: Validate registry (schema + shared policies)
         run: scripts/check.sh
 
-      - name: Generate docs
+  docs-drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Read pinned weaver version
+        id: weaver-version
+        run: echo "version=$(<.weaver-version)" >> "$GITHUB_OUTPUT"
+
+      - name: Install Weaver
+        uses: open-telemetry/weaver/.github/actions/setup-weaver@f8e1b42fbd1e09df5263c26b7df6011eaafd454d
+        with:
+          version: '${{ steps.weaver-version.outputs.version }}'
+
+      - name: Regenerate docs
         run: scripts/generate-docs.sh
 
-      - name: Check docs drift
-        run: git diff --exit-code docs/
+      - name: Check committed docs are in sync
+        run: |
+          if ! git diff --exit-code -- docs/; then
+            echo "FAIL: committed docs are out of sync. Run scripts/generate-docs.sh and commit the changes."
+            exit 1
+          fi
+          untracked=$(git ls-files --others --exclude-standard -- docs/)
+          if [ -n "$untracked" ]; then
+            echo "FAIL: untracked generated files under docs/:"
+            echo "$untracked"
+            exit 1
+          fi
+          echo "OK: committed docs are up to date"
+
+  # Aggregate gate for branch protection: require only this job.
+  required-status-check:
+    if: always()
+    needs:
+      - check
+      - docs-drift
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fail if any dependency did not pass
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        run: exit 1

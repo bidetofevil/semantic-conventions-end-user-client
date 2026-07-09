@@ -41,9 +41,9 @@ different directory as the first argument if preferred).  To update it, change t
 `.weaver-version` and rerun the script.
 
 ```bash
-scripts/check.sh          # validate the model (including dependency resolution)
-scripts/resolve.sh        # produce build/resolved-registry.yaml
+scripts/check.sh          # validate the model: dependency resolution + shared OTel policies
 scripts/generate-docs.sh  # regenerate docs/ from the model
+scripts/package.sh        # produce publication manifest and resolved registry under build/package/
 ```
 
 ## Consuming this registry

@@ -1,7 +1,7 @@
-groups:
-  - id: event.app.nav_complete
-    type: event
-    name: app.nav_complete
+file_format: definition/2
+events:
+  - name: app.nav_complete
+    requirement_level: recommended
     stability: development
     brief: >
       Fired when an app navigation event has completed.

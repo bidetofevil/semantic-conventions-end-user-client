@@ -1,17 +1,29 @@
+# Filters operate on the v2 resolved registry that `weaver registry generate --v2`
+# hands to templates:
+#   .registry.attributes -- local attributes PLUS upstream attributes that share a
+#                           root namespace with a local one (e.g. upstream app.*).
+#                           Locally-defined entries carry a `provenance` field
+#                           pointing at their model file; upstream ones do not.
+#   .registry.events     -- same provenance rule; refs are inlined with `key` and
+#                           `requirement_level`.
+# These docs cover only what this registry defines, so both filters select on
+# provenance before bucketing by root namespace (first `.`-separated segment).
 templates:
   - pattern: attributes.md.j2
     filter: >
-      semconv_grouped_attributes({
-        "exclude_stability": []
-      })
-      | map({ root_namespace: .root_namespace,
-              attributes: (.attributes | unique_by(.name)) })
+      .registry.attributes
+      | map(select(has("provenance")))
+      | group_by(.key | split(".") | .[0])
+      | map({ root_namespace: (.[0].key | split(".") | .[0]),
+              attributes: (. | unique_by(.key)) })
     application_mode: each
     file_name: "attributes/{{ctx.root_namespace}}.md"
   - pattern: events.md.j2
     filter: >
-      semconv_grouped_events({
-        "exclude_stability": []
-      })
+      .registry.events
+      | map(select(has("provenance")))
+      | group_by(.name | split(".") | .[0])
+      | map({ root_namespace: (.[0].name | split(".") | .[0]),
+              events: . })
     application_mode: each
     file_name: "events/{{ctx.root_namespace}}.md"

@@ -6,6 +6,8 @@
 
 **Stability:** development
 
+**Requirement level:** recommended
+
 Fired when an app navigation event has completed.
 
 | Attribute | Requirement level |

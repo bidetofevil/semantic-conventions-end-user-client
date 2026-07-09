@@ -4,6 +4,6 @@
 
 | Attribute | Type | Stability | Description | Examples |
 |---|---|---|---|---|
-{%- for attribute in ctx.attributes %}
-| `{{ attribute.name }}` | `{% if attribute.type is string %}{{ attribute.type }}{% else %}enum{% endif %}` | {{ attribute.stability }} | {{ attribute.brief | trim | replace("\n", " ") }} | {% for example in attribute.examples | default([]) %}`{{ example }}`{% if not loop.last %}, {% endif %}{% endfor %} |
+{%- for attribute in ctx.attributes | sort(attribute="key") %}
+| `{{ attribute.key }}` | `{% if attribute.type is string %}{{ attribute.type }}{% else %}enum{% endif %}` | {{ attribute.stability }} | {{ attribute.brief | trim | replace("\n", " ") }} | {% for example in attribute.examples | default([]) %}`{{ example }}`{% if not loop.last %}, {% endif %}{% endfor %} |
 {%- endfor %}
