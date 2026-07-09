@@ -56,7 +56,7 @@ There are two ways to consume this registry:
 
       ```bash
       weaver registry generate \
-        -r 'https://github.com/bidetofevil/end-user-client-semantic-conventions@<tag>[model]' \
+        -r 'https://github.com/bidetofevil/semantic-conventions-end-user-client@<tag>[model]' \
         --templates <templates-dir> <target> <output-dir>
       ```
 
@@ -67,7 +67,7 @@ There are two ways to consume this registry:
       ```yaml
       dependencies:
         - name: end-user-client
-          registry_path: https://github.com/bidetofevil/end-user-client-semantic-conventions@<tag>[model]
+          registry_path: https://github.com/bidetofevil/semantic-conventions-end-user-client@<tag>[model]
       ```
 
 ## Roadmap
