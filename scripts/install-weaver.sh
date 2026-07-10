@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
-# Installs the weaver release pinned in .weaver-version for the host platform.
+# Installs the weaver release pinned in versions.env for the host platform.
 #
 # Downloads the official release binary from GitHub, verifies its sha256 checksum,
 # and installs it to ~/.local/bin (or the directory given as the first argument).
-# To update weaver, bump .weaver-version and rerun this script.
+# To update weaver, bump WEAVER_VERSION in versions.env and rerun this script.
 #
 # Usage: scripts/install-weaver.sh [install-dir]
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="$(<"${REPO_ROOT}/.weaver-version")"
+# shellcheck source=../versions.env
+source "${REPO_ROOT}/versions.env"
+VERSION="${WEAVER_VERSION#v}"
 INSTALL_DIR="${1:-${HOME}/.local/bin}"
 
 case "$(uname -s)" in

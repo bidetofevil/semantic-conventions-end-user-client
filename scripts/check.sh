@@ -7,9 +7,15 @@
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
-# Shared OTel policy pack. Materialized as a local checkout under build/.
-POLICY_REPO_URL="https://github.com/open-telemetry/opentelemetry-weaver-packages.git"
-POLICY_REPO_REF="d84341cf20a1fef1a833ef44d318c41a770e6e64"
+# Error out if the pinned upstream version isn't the same as the one declared in the manifest
+if ! grep -q "semantic-conventions@${CORE_SEMCONV_VERSION}\[model\]" "${REPO_ROOT}/model/manifest.yaml"; then
+  echo "error: model/manifest.yaml upstream registry_path does not match CORE_SEMCONV_VERSION=${CORE_SEMCONV_VERSION} in versions.env." >&2
+  echo "Update whichever of the two is stale so they agree." >&2
+  exit 1
+fi
+
+# Shared OTel policy pack (URL/ref pinned in versions.env). Materialized as a
+# local checkout under build/.
 POLICY_DIR="${REPO_ROOT}/build/weaver-policies"
 POLICY_STAMP="${POLICY_DIR}/.${POLICY_REPO_REF}"
 

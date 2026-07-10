@@ -36,9 +36,10 @@ scripts/                  validation / resolution / docs generation
 
 [Weaver](https://github.com/open-telemetry/weaver) is not available via package managers like Homebrew, but you can install by running
 `scripts/install-weaver.sh`, which downloads the release binary pinned in
-[`.weaver-version`](.weaver-version) and installs it to `~/.local/bin` (pass a
-different directory as the first argument if preferred).  To update it, change the version defined in
-`.weaver-version` and rerun the script.
+[`versions.env`](versions.env) and installs it to `~/.local/bin` (pass a
+different directory as the first argument if preferred).  To update it, change `WEAVER_VERSION` in
+`versions.env` and rerun the script. The same file pins the upstream
+semantic-conventions tag and the shared policy pack used by `scripts/check.sh`.
 
 ```bash
 scripts/check.sh          # validate the model: dependency resolution + shared OTel policies
