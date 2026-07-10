@@ -1,6 +1,6 @@
 name: end-user-client
 description: Federated semantic conventions for end user client applications.
-schema_url: https://opentelemetry.io/schemas/end-user-client-dev/0.1.0-dev
+schema_url: https://opentelemetry.io/schemas/end-user-client-dev/0.2.0-dev
 stability: development
 dependencies:
   - schema_url: https://opentelemetry.io/schemas/1.43.0
