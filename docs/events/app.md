@@ -10,7 +10,10 @@
 
 Fired when an app navigation event has completed.
 
-| Attribute | Requirement level |
-|---|---|
-| `app.nav.destination` | recommended |
-| `session.id` | recommended |
+Navigation completion SHOULD be reported after the destination is loaded, not when the navigation is merely triggered.
+
+| Attribute | Type | Requirement level | Description |
+|---|---|---|---|
+| `app.action.end_type` | `enum` | recommended | Types of ending for an app action. |
+| `app.nav.destination` | `string` | conditionally required (When the navigation destination can be determined.) | A human-readable string that uniquely identifies the destination of app navigation. |
+| `session.id` | `string` | recommended | A unique id to identify a session. |
