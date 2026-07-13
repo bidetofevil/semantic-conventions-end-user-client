@@ -1,4 +1,16 @@
 file_format: definition/2
+
+attribute_groups:
+  - id: registry.end_user_client.app
+    visibility: public
+    stability: development
+    brief: >
+      Public attributes in this registry in the `app` namespace.
+    attributes:
+      - ref: app.action.end_type
+      - ref: app.environment
+      - ref: app.nav.destination
+
 attributes:
   - key: app.action.end_type
     type:

@@ -31,4 +31,5 @@ fi
 weaver registry check \
   -r "${REPO_ROOT}/model" \
   --v2 \
-  --policy "${POLICY_DIR}/policies/check"
+  --policy "${POLICY_DIR}/policies/check" \
+  --policy "${REPO_ROOT}/policies/check/public-attribute-groups"
