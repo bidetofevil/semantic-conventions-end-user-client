@@ -47,6 +47,8 @@ scripts/generate-docs.sh  # regenerate docs/ from the model
 scripts/package.sh        # produce publication manifest and resolved registry under build/package/
 ```
 
+See [RELEASING.md](RELEASING.md) for how versions are cut and published.
+
 ## Consuming this registry
 
 There are two ways to consume this registry:

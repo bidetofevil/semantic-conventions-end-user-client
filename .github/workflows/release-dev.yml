@@ -1,0 +1,73 @@
+name: Release (dev)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Compute tag from model/manifest.yaml
+        id: tag
+        run: |
+          version=$(awk '/^schema_url:/ { n = split($2, parts, "/"); print parts[n]; exit }' model/manifest.yaml)
+          if [ -z "$version" ]; then
+            echo "Could not parse version from model/manifest.yaml"
+            exit 1
+          fi
+          case "$version" in
+            *-dev) ;;
+            *)
+              echo "Version '${version}' is not a -dev version; this workflow only cuts dev releases."
+              exit 1
+              ;;
+          esac
+          echo "tag=v${version}" >> "$GITHUB_OUTPUT"
+          echo "Tag: v${version}"
+
+      - name: Refuse if the tag already exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" >/dev/null 2>&1; then
+            echo "Tag '${TAG}' already exists. Tags are immutable; bump the version"
+            echo "segment of schema_url in model/manifest.yaml and merge that first."
+            exit 1
+          fi
+          echo "Tag '${TAG}' is new."
+
+      - name: Read pinned weaver version
+        id: weaver-version
+        run: echo "version=$(sed -n 's/^WEAVER_VERSION=v\{0,1\}//p' versions.env)" >> "$GITHUB_OUTPUT"
+
+      - name: Install Weaver
+        uses: open-telemetry/weaver/.github/actions/setup-weaver@f8e1b42fbd1e09df5263c26b7df6011eaafd454d
+        with:
+          version: '${{ steps.weaver-version.outputs.version }}'
+
+      - name: Validate registry
+        run: scripts/check.sh
+
+      - name: Package publication artifacts
+        run: scripts/package.sh
+
+      - name: Create prerelease with artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          gh release create "$TAG" \
+            build/package/manifest.yaml \
+            build/package/resolved.yaml \
+            --title "$TAG" \
+            --prerelease \
+            --generate-notes \
+            --target "$GITHUB_SHA"
+          echo "Released ${TAG} at ${GITHUB_SHA}"
