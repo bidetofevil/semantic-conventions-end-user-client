@@ -12,6 +12,12 @@ It contains YAMLs that defines the semantic conventions, and scripts to generate
 markdown files, but does not generate language-specific binaries that are directly
 consumable in instrumentation projects.
 
+> [!NOTE]
+> **The attributes and events in this registry are just glorified sample data**.
+> They are here to demonstrate the various features of the semantic convention schema.
+> They have not been vetted, and will be deleted before the registry is moved into the
+> `open-telemetry` org unless they have been reviewed and approved before then.
+
 ## Relationship to other registries
 
 - **Extends**: Base OTel semantic conventions ([`open-telemetry/semantic-conventions`](https://github.com/open-telemetry/semantic-conventions)).

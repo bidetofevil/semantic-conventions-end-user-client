@@ -4,7 +4,12 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 VERSION="$(awk '/^schema_url:/ { n = split($2, parts, "/"); print parts[n]; exit }' "${REPO_ROOT}/model/manifest.yaml")"
-RESOLVED_SCHEMA_URI="https://github.com/bidetofevil/semantic-conventions-end-user-client/releases/download/v${VERSION}/resolved.yaml"
+REPO_URL="$(git -C "${REPO_ROOT}" remote get-url origin)"
+REPO_URL="${REPO_URL%.git}"
+case "${REPO_URL}" in
+  git@github.com:*) REPO_URL="https://github.com/${REPO_URL#git@github.com:}" ;;
+esac
+RESOLVED_SCHEMA_URI="${REPO_URL}/releases/download/v${VERSION}/resolved.yaml"
 
 rm -rf "${REPO_ROOT}/build/package"
 weaver registry package \

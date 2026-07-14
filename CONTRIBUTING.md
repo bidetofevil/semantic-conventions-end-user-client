@@ -2,7 +2,7 @@
 
 ## Proposing a new convention
 
-TBD
+To be determined once this registry is moved into the `open-telemetry` org.
 
 ## Public API: group IDs and event names
 
